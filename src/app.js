@@ -43,32 +43,15 @@ app.get('/help', (req, res) => {
     })
 })
 
-app.get('/weather', (req, res) => {
+app.get('/weather', async (req, res) => {
     let address = req.query.address
     if (!address) {
-        return res.send({
-            error: 'You must provide an address'
-        })
+        res.json({error: 'You must provide an address'})
     }
+    const point = await geocode(address);
+    const weather = await forecast(point.latitude, point.longitude);
+    res.json(weather);
 
-    geocode(address, (error, { latitude, longitude, location } = {}) => {
-
-        if (error) {
-            return res.send({ error })
-        }
-
-        forecast(latitude, longitude, (error, forecastData) => {
-
-            if (error) {
-                return res.send({ error }) 
-            }
-
-            res.send({
-                location,
-                forecastData
-            })
-        })
-    })
 })
 
 app.get('/products', (req, res) => {
