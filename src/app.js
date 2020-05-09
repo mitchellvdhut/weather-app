@@ -4,6 +4,7 @@ const hbs = require('hbs')
 
 const geocode = require('./utils/geocode')
 const forecast = require('./utils/forecast')
+const kanye = require('./utils/kanye')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -60,7 +61,7 @@ app.get('/weather', (req, res) => {
         forecast(latitude, longitude, (error, forecastData) => {
 
             if (error) {
-                return res.send({ error }) 
+                return res.send({ error })
             }
 
             res.send({
@@ -81,6 +82,13 @@ app.get('/products', (req, res) => {
     console.log(req.query.search)
     res.send({
         products: []
+    })
+})
+
+app.get('/quote', (req, res) => {
+    kanye((error, data) => {
+        const response = error ? error.message : data;
+        res.json(response);
     })
 })
 
