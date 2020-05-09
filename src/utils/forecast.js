@@ -1,7 +1,6 @@
 const axios = require('axios')
 
-const forecast = (latitude, longitude) => {
-    if(!latitude || !longitude) return 'forecast.js - invalid params'
+const forecast = (latitude = 0, longitude = 0) => {
     const url = `http://api.weatherstack.com/current?access_key=6edabfb63087324fba55bfee385ad43b&query=${latitude},${longitude}`
     return axios(url).then(res => {
         const {temperature, feelslike, weather_descriptions} = res.data.current;

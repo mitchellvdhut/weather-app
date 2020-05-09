@@ -1,7 +1,6 @@
 const axios = require('axios')
 
 const geocode = (address) => {
-    if(!address) return 'geocode.js - invalid params'
     const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=pk.eyJ1IjoibWl0Y2hlbGx2ZGh1dCIsImEiOiJjazlnNmtreXIwMGRnM21vN2p1cGYwYTJuIn0.N4a9wgI9Y08XrZSm6I12Pg&limit=1`
     return axios({url}).then(res => {
         return res.data.features.length === 0 ?
