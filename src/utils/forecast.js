@@ -6,9 +6,9 @@ const forecast = (latitude, longitude) => {
     return axios(url).then((res) => {
         console.log(res)
         const {temperature, feelslike, weather_descriptions} = res.data.current;
-        if(res.data.error) return 'Unable to find location. Try another search query.'
-        return `It is currently ${weather_descriptions[0]} at ${temperature} degrees. 
-        'It feels like ${feelslike} degrees.`
+        return res.data.error ?
+            'Unable to find location. Try another search query.' :
+            `It is currently ${weather_descriptions[0]} at ${temperature} degrees. It feels like ${feelslike} degrees.`
     }).catch(err => err.message);
 }
 
