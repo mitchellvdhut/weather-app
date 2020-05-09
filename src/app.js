@@ -23,9 +23,20 @@ hbs.registerPartials(partialsPath)
 app.use(express.static(publicDirectoryPath))
 
 app.get('', (req, res) => {
+    let cookies = req.headers.cookie.split(';').map(cookie => {
+        cookie = cookie.split('=');
+        return {
+            name: cookie[0].trim(),
+            value: cookie[1].trim(),
+        }
+    })
+
+    const lastLocation = cookies.filter(cookie => cookie.name === 'mitchell_site')[0].value;
+
     res.render('index', {
         title: 'Weather app',
-        name: 'Mitchell'
+        name: 'Mitchell',
+        lastLocation,
     })
 })
 
@@ -63,7 +74,7 @@ app.get('/weather', (req, res) => {
             if (error) {
                 return res.send({ error })
             }
-
+            res.setHeader('Set-Cookie', `mitchell_site=${address}`)
             res.send({
                 location,
                 forecastData
@@ -90,6 +101,18 @@ app.get('/quote', (req, res) => {
         const response = error ? error.message : data;
         res.json(response);
     })
+})
+
+
+app.get('/cookies', (req, res) => {
+    let cookies = req.headers.cookie.split(';').map(cookie => {
+        cookie = cookie.split('=');
+        return {
+            name: cookie[0].trim(),
+            value: cookie[1].trim(),
+        }
+    })
+    res.json(cookies);
 })
 
 app.get('/help/*', (req, res) => {
