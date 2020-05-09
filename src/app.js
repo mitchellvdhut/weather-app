@@ -101,10 +101,14 @@ app.get('/help/*', (req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.render('404', {
-        title: '404',
-        name: 'Mitchell',
-        errorMessage: 'Page not found'
+    kanye((error, data) => {
+        const response = error ? error.message : data;
+        res.render('404', {
+            title: '404 - Not Found',
+            error: 'Page not found',
+            name: 'Mitchell',
+            quote: response,
+        })
     })
 })
 
