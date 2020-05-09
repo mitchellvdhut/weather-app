@@ -51,7 +51,6 @@ app.get('/weather', async (req, res) => {
     const point = await geocode(address);
     const weather = await forecast(point.latitude, point.longitude);
     res.json(weather);
-
 })
 
 app.get('/products', (req, res) => {
