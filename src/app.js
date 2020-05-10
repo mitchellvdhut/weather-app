@@ -74,7 +74,8 @@ app.get('/weather', (req, res) => {
             if (error) {
                 return res.send({ error })
             }
-            res.setHeader('Set-Cookie', `mitchell_site=${address}`)
+            const YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
+            res.setHeader('Set-Cookie', `mitchell_site=${address};Max-Age=${YEAR_IN_SECONDS}`)
             res.send({
                 location,
                 forecastData
@@ -89,8 +90,6 @@ app.get('/products', (req, res) => {
             error: 'You must provide a search term'
         })
     }
-
-    console.log(req.query.search)
     res.send({
         products: []
     })
