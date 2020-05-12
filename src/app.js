@@ -137,12 +137,11 @@ app.get('/help/*', (req, res) => {
 
 app.get('*', (req, res) => {
     kanye((error, data) => {
-        const quote = error ? error.message : data
         res.render('404', {
             title: '404 - Not Found',
             error: 'Page not found',
             name: 'Mitchell',
-            quote: quote,
+            quote: error ? error.message : data,
         })
     })
 })
