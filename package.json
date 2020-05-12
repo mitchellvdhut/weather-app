@@ -1,17 +1,28 @@
 {
-  "name": "web-server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node src/app.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.16.4",
-    "hbs": "^4.0.1",
-    "request": "^2.88.0"
-  }
+    "name": "web-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node src/app.js",
+        "dev": "nodemon src/app.js -e js,hbs"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.16.4",
+        "hbs": "^4.0.1",
+        "husky": "^4.2.5",
+        "pretty-quick": "^2.0.1",
+        "request": "^2.88.0"
+    },
+    "devDependencies": {
+        "prettier": "2.0.5"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged"
+        }
+    }
 }
