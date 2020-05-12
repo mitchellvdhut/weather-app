@@ -1,11 +1,9 @@
 const request = require('request')
 
 const kanye = (callback) => {
-    const url = 'http://api.kanye.rest'
-
     request(
         {
-            url,
+            url: process.env.KANYE_REST_ENDPOINT,
             json: true,
         },
         (error, { body } = {}) => {

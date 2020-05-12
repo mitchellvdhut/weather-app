@@ -2,7 +2,10 @@ const request = require('request')
 
 const forecast = (latitude, longitude, callback) => {
     const url =
-        'http://api.weatherstack.com/current?access_key=6edabfb63087324fba55bfee385ad43b&query=' +
+        process.env.WEATHER_ENDPOINT +
+        '?access_key=' +
+        process.env.WEATHER_KEY +
+        '&query=' +
         latitude +
         ',' +
         longitude
