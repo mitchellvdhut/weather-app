@@ -4,6 +4,7 @@ const hbs = require('hbs')
 
 const geocode = require('./utils/geocode')
 const forecast = require('./utils/forecast')
+const kanye = require('./utils/kanye')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -21,11 +22,34 @@ hbs.registerPartials(partialsPath)
 // Set up static directory to serve
 app.use(express.static(publicDirectoryPath))
 
+const cookieParser = (req, res, next) => {
+    let cookies = {}
+    if (req.headers.cookie) {
+        req.headers.cookie.split(';').forEach(cookie => {
+            cookie = cookie.split("=")
+            const key = cookie[0].trim()
+            const value = cookie[1]
+            cookies [key] = value
+        });
+    }
+    req.cookies = cookies;
+    next()
+}
+
+app.use(cookieParser)
+
 app.get('', (req, res) => {
-    res.render('index', {
+
+    lastLocation = decodeURI(req.cookies.mitchell_site)
+    const args = {
         title: 'Weather app',
-        name: 'Mitchell'
-    })
+        name: 'Mitchell',
+    }
+
+    if (lastLocation) {
+        args ['lastLocation'] = lastLocation
+    }
+    res.render('index', args)
 })
 
 app.get('/about', (req, res) => {
@@ -44,7 +68,12 @@ app.get('/help', (req, res) => {
 })
 
 app.get('/weather', (req, res) => {
+    
     let address = req.query.address
+
+    //set cookie
+    res.cookie('mitchell_site', address, { maxAge: 900000})
+
     if (!address) {
         return res.send({
             error: 'You must provide an address'
@@ -53,20 +82,12 @@ app.get('/weather', (req, res) => {
 
     geocode(address, (error, { latitude, longitude, location } = {}) => {
 
-        if (error) {
-            return res.send({ error })
-        }
+        if (error) return res.send({ error })
 
         forecast(latitude, longitude, (error, forecastData) => {
 
-            if (error) {
-                return res.send({ error }) 
-            }
+            error ? res.send({ error}) : res.send({location, forecastData})
 
-            res.send({
-                location,
-                forecastData
-            })
         })
     })
 })
@@ -84,19 +105,33 @@ app.get('/products', (req, res) => {
     })
 })
 
-app.get('/help/*', (req, res) => {
-    res.render('404', {
-        title: '404',
-        name: 'Mitchell',
-        errorMessage: 'Help article not found'
+app.get('/kanye', (req, res) => {
+    kanye((error, data) => {
+        res.json(data)
     })
 })
 
+app.get('/cookies', (req, res) => {
+    res.json(req.cookies)
+})
+
+// app.get('/help/*', (req, res) => {
+//     res.render('404', {
+//         title: '404',
+//         name: 'Mitchell',
+//         errorMessage: 'Help article not found'
+//     })
+// })
+
 app.get('*', (req, res) => {
-    res.render('404', {
-        title: '404',
-        name: 'Mitchell',
-        errorMessage: 'Page not found'
+    kanye((error, data) => {
+
+        res.render('404', {
+            title: '404',
+            name: 'Mitchell',
+            errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
+            quote: error ? error.message : data
+        })
     })
 })
 

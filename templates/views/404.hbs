@@ -10,7 +10,11 @@
 <body>
     <div class="main-content">
         {{>header}}
-        <p>{{errorMessage}}</p>
+        <div class="quote">
+            <p class="errorMessage">{{errorMessage}}</p>
+            <blockquote>{{quote}}</blockquote>
+            <cite> - Kanye West</cite>
+        </div>
     </div>
     {{>footer}}
 </body>
