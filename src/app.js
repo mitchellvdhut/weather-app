@@ -1,6 +1,7 @@
 const path = require('path')
 const express = require('express')
 const hbs = require('hbs')
+require('dotenv').config()
 
 const geocode = require('./utils/geocode')
 const forecast = require('./utils/forecast')
@@ -36,7 +37,16 @@ const cookieParser = (req, res, next) => {
     next()
 }
 
+const corsWare = (req, res, next) => {
+    app.use(function (req, res, next) {
+        res.header("Access-Control-Allow-Origin", "http://mitchellvdhut.com/");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+    });
+}
+
 app.use(cookieParser)
+app.use(corsWare)
 
 app.get('', (req, res) => {
 

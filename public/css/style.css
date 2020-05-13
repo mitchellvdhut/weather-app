@@ -48,10 +48,13 @@ header a {
     width: 250px;
     filter: hue-rotate(180deg);
 }
-
+form {
+    display: flex;
+}
 input {
     border: 1px solid #cccccc;
     padding: 8px;
+    flex-grow: 1;
 }
 
 button {
