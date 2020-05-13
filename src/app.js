@@ -1,6 +1,7 @@
 const path = require('path')
 const express = require('express')
 const hbs = require('hbs')
+const cors = require('cors')
 require('dotenv').config()
 
 const geocode = require('./utils/geocode')
@@ -37,16 +38,20 @@ const cookieParser = (req, res, next) => {
     next()
 }
 
-const corsWare = (req, res, next) => {
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        next();
+const whitelist = ['http://mitchellvdhut.com', 'localhost:3000']
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    }
 }
 
-app.use(corsWare)
 app.use(cookieParser)
 
-app.get('', (req, res) => {
+app.get('',cors(corsOptions), (req, res, next) => {
 
     lastLocation = decodeURI(req.cookies.mitchell_site)
     const args = {
@@ -58,6 +63,32 @@ app.get('', (req, res) => {
         args ['lastLocation'] = lastLocation
     }
     res.render('index', args)
+    res.send({args})
+})
+
+app.get('/weather', cors(corsOptions), (req, res, next) => {
+
+    let address = req.query.address
+
+    //set cookie
+    res.cookie('mitchell_site', address, { maxAge: 900000 })
+
+    if (!address) {
+        return res.send({
+            error: 'You must provide an address'
+        })
+    }
+
+    geocode(address, (error, { latitude, longitude, location } = {}) => {
+
+        if (error) return res.send({ error })
+
+        forecast(latitude, longitude, (error, forecastData) => {
+
+            error ? res.send({ error }) : res.send({ location, forecastData })
+
+        })
+    })
 })
 
 app.get('/about', (req, res) => {
@@ -72,31 +103,6 @@ app.get('/help', (req, res) => {
         title: 'Help page',
         error: 'error: content missing',
         name: 'Mitchell'
-    })
-})
-
-app.get('/weather', (req, res) => {
-    
-    let address = req.query.address
-
-    //set cookie
-    res.cookie('mitchell_site', address, { maxAge: 900000})
-
-    if (!address) {
-        return res.send({
-            error: 'You must provide an address'
-        })
-    }
-
-    geocode(address, (error, { latitude, longitude, location } = {}) => {
-
-        if (error) return res.send({ error })
-
-        forecast(latitude, longitude, (error, forecastData) => {
-
-            error ? res.send({ error}) : res.send({location, forecastData})
-
-        })
     })
 })
 
