@@ -40,11 +40,11 @@ const cookieParser = (req, res, next) => {
 
 const whitelist = ['http://mitchellvdhut.com', 'localhost:3000']
 const corsOptions = {
-    origin: function (origin, callback) {
+    function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1) {
-            callback(null, true)
+            callback(undefined, true)
         } else {
-            callback(new Error('Not allowed by CORS'))
+            callback(new Error('Not allowed by CORS'), undefined)
         }
     }
 }
@@ -53,17 +53,15 @@ app.use(cookieParser)
 
 app.get('',cors(corsOptions), (req, res, next) => {
 
-    lastLocation = decodeURI(req.cookies.mitchell_site)
+    const lastLocation = decodeURI(req.cookies.mitchell_site)
     const args = {
         title: 'Weather app',
         name: 'Mitchell',
+        lastLocation: lastLocation ? lastLocation : "Location"
     }
 
-    if (lastLocation) {
-        args ['lastLocation'] = lastLocation
-    }
-    res.render('index', args)
-    res.send({args})
+    // res.render('index', args)
+    res.json(args)
 })
 
 app.get('/weather', cors(corsOptions), (req, res, next) => {
@@ -74,32 +72,41 @@ app.get('/weather', cors(corsOptions), (req, res, next) => {
     res.cookie('mitchell_site', address, { maxAge: 900000 })
 
     if (!address) {
-        return res.send({
+        return res.json({
             error: 'You must provide an address'
         })
     }
 
     geocode(address, (error, { latitude, longitude, location } = {}) => {
 
-        if (error) return res.send({ error })
+        if (error) return res.json({ error })
 
         forecast(latitude, longitude, (error, forecastData) => {
 
-            error ? res.send({ error }) : res.send({ location, forecastData })
+            error ? res.json({ error }) : res.json({ location, forecastData })
 
         })
     })
 })
 
 app.get('/about', (req, res) => {
-    res.render('about', {
+    // res.render('about', {
+    //     title: 'About page',
+    //     name: 'Mitchell'
+    // })
+    res.json({
         title: 'About page',
         name: 'Mitchell'
     })
 })
 
 app.get('/help', (req, res) => {
-    res.render('help', {
+    // res.render('help', {
+    //     title: 'Help page',
+    //     error: 'error: content missing',
+    //     name: 'Mitchell'
+    // })
+    res,json({
         title: 'Help page',
         error: 'error: content missing',
         name: 'Mitchell'
@@ -140,7 +147,13 @@ app.get('/cookies', (req, res) => {
 app.get('*', (req, res) => {
     kanye((error, data) => {
 
-        res.render('404', {
+        // res.render('404', {
+        //     title: '404',
+        //     name: 'Mitchell',
+        //     errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
+        //     quote: error ? error.message : data
+        // })
+        res.json({
             title: '404',
             name: 'Mitchell',
             errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
