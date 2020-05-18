@@ -1,7 +1,6 @@
 const path = require('path')
 const express = require('express')
 const hbs = require('hbs')
-const cors = require('cors')
 require('dotenv').config()
 
 const geocode = require('./utils/geocode')
@@ -38,38 +37,43 @@ const cookieParser = (req, res, next) => {
     next()
 }
 
-const whitelist = ['http://mitchellvdhut.com', 'localhost:3000']
-const corsOptions = {
-    function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
-            callback(undefined, true)
-        } else {
-            callback(new Error('Not allowed by CORS'), undefined)
-        }
-    }
+const corsInterceptor = (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Credentials', true)
+    res.setHeader('Access-Control-Allow-Origin', 'https://mitchellvdhut.com')
+    res.setHeader('Access-Control-Allow-Headers', "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept")
+    res.setHeader('Access-Control-Allow-Methods', 'GET')
+    next();
 }
 
+app.use(corsInterceptor)
 app.use(cookieParser)
 
-app.get('',cors(corsOptions), (req, res, next) => {
+app.get('', (req, res, next) => {
 
-    const lastLocation = decodeURI(req.cookies.mitchell_site)
+    const lastLocation = req.cookies.last_location ? decodeURI(req.cookies.last_location) : "Search for a location"
     const args = {
         title: 'Weather app',
         name: 'Mitchell',
-        lastLocation: lastLocation ? lastLocation : "Location"
+        lastLocation: lastLocation,
     }
 
     // res.render('index', args)
     res.json(args)
 })
 
-app.get('/weather', cors(corsOptions), (req, res, next) => {
+app.get('/weather', (req, res, next) => {
 
     let address = req.query.address
 
     //set cookie
-    res.cookie('mitchell_site', address, { maxAge: 900000 })
+    res.cookie('last_location', address, { 
+        maxAge: 900000, 
+        //secure: true, 
+        SameSite: false,
+        Path: '/',
+        Domain: 'www.mitchellvdhut.com'
+    })
+    //res.setHeader('Set-Cookie', `last_location=${address}; Max-Age=900000; Secure; SameSite=None; Path=/; Domain=www.mitchellvdhut.com`)
 
     if (!address) {
         return res.json({
@@ -147,18 +151,18 @@ app.get('/cookies', (req, res) => {
 app.get('*', (req, res) => {
     kanye((error, data) => {
 
-        // res.render('404', {
-        //     title: '404',
-        //     name: 'Mitchell',
-        //     errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
-        //     quote: error ? error.message : data
-        // })
-        res.json({
+        res.render('404', {
             title: '404',
             name: 'Mitchell',
             errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
             quote: error ? error.message : data
         })
+        // res.json({
+        //     title: '404',
+        //     name: 'Mitchell',
+        //     errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
+        //     quote: error ? error.message : data
+        // })
     })
 })
 
