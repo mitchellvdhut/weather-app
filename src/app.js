@@ -151,18 +151,18 @@ app.get('/cookies', (req, res) => {
 app.get('*', (req, res) => {
     kanye((error, data) => {
 
-        res.render('404', {
-            title: '404',
-            name: 'Mitchell',
-            errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
-            quote: error ? error.message : data
-        })
-        // res.json({
+        // res.render('404', {
         //     title: '404',
         //     name: 'Mitchell',
         //     errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
         //     quote: error ? error.message : data
         // })
+        res.json({
+            title: '404',
+            name: 'Mitchell',
+            errorMessage: 'Some beautiful paths can\'t be discovered without getting lost.',
+            quote: error ? error.message : data
+        })
     })
 })
 
